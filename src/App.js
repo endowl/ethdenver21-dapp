@@ -11,6 +11,8 @@ import {Buckets, Client, PrivateKey} from '@textile/hub';
 import {useEffect, useState} from "react";
 import {Button, Collapse, Form} from "react-bootstrap";
 import LetterToTrustedPerson from "./components/LetterToTrustedPerson";
+import {set} from "lodash"
+import OpolisDataModal from "./components/OpolisDataModal";
 
 const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
@@ -117,9 +119,66 @@ function Alice() {
     }
 
     const [docProps, setDocProps] = useState({
-        full_name: 'Alice Finnegan',
-        policy: 420523000111,
-        life_insurance_coverage: "$10,000,000",
+        "trusted-person": {
+            "name": "Bobby McGee"
+        },
+        "member": {
+            "id": "22918",
+            "name": "Alice Wonderland",
+            "isDeceased": true
+        },
+        "opolis": {
+            "contact": {
+                "name": "John Paller",
+                "phone": "(505) 505-0505"
+            }
+        },
+        "benefits": {
+            "short-term-disability": {
+                "percentage": 0.6,
+                "startdays": 14,
+                "enddays": 84,
+                "insurer": "Great American Mutual Insurance Company",
+                "policy-number": "23H98D3",
+                "group-number": "0001",
+                "claims-agent": {
+                    "name": "Alec Eiffel",
+                    "phone": "(866) 555-9876"
+                }
+            },
+            "long-term-disability": {
+                "percentage": 0.4,
+                "startdays": 85,
+                "enddays": 730,
+                "insurer": "American Mutual Insurance Company Group",
+                "policy-number": "2H9833D",
+                "group-number": "0001",
+                "claims-agent": {
+                    "name": "Nikki Wendal",
+                    "phone": "(888) 555-6789"
+                }
+            },
+            "term-life": {
+                "amount": 250000,
+                "policy-number": "OICU812",
+                "insurer": "Mutual Insurance Group of Omaha",
+                "beneficary": {
+                    "name": "Mary Jane McGee"
+                },
+                "claims-agent": {
+                    "name": "Tom Major",
+                    "phone": "(877) 867-5309"
+                }
+            }
+        },
+        "wallet": {
+            "device": {
+                "name": "Ledger Hardware Wallet",
+                "location": "top drawer of my desk",
+                "pin": "923745"
+            },
+            "private-key": "3gd5wvxohmvj5ctgzfontxeowzedixqhfje4776he5tfkfc5u"
+        }
     });
 
     useEffect(() => {
@@ -160,6 +219,7 @@ function Alice() {
                 let path = 'index.json';
                 const metadata = buckets.pullPath(buck.root.key, path)
                 const { value } = await metadata.next();
+                console.log(value)
                 let str = "";
                 for (var i = 0; i < value.length; i++) {
                     str += String.fromCharCode(parseInt(value[i]));
@@ -212,6 +272,10 @@ function Alice() {
         }
     }
 
+    const setState = path => ({target: {value}}) => {
+        const newDocProps = set({...docProps}, path, value)
+        setDocProps(newDocProps)
+    }
 
     return (
         <>
@@ -296,42 +360,12 @@ function Alice() {
                     </div>
                 </div>
             </header>
-
-            <Modal show={show} onHide={handleClose} size="lg" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Opolis Policy Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Your <strong>Opolis Policy Details</strong> document has been pre-populated using your <strong>Opolis account</strong>.<br/>
-                    <Form>
-                        <Form.Group>
-                            <Form.Label>Full Name</Form.Label>
-                            <Form.Control value={docProps.full_name} onChange={event => setDocProps({...docProps, full_name: event.target.value})} />
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>Policy #</Form.Label>
-                            <Form.Control value={docProps.policy} onChange={event => setDocProps({...docProps, policy: event.target.value})} />
-                        </Form.Group>
-                        <Form.Group>
-                            <Form.Label>Life insurance coverage</Form.Label>
-                            <Form.Control value={docProps.life_insurance_coverage} onChange={event => setDocProps({...docProps, life_insurance_coverage: event.target.value})} />
-                        </Form.Group>
-                    </Form>
-                    <code>
-                        <strong>{docProps.full_name}</strong> is a customer of Opolis with policy # <strong>{docProps.policy}</strong>.<br />
-                        Life insurance coverage is held in the amount of <strong>{docProps.life_insurance_coverage}</strong>.<br />
-                        {/*Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.*/}
-                    </code>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <OpolisDataModal
+                show={show}
+                handleClose={handleClose}
+                docProps={docProps}
+                setState={setState}
+            />
         </>
     )
 }

@@ -2,10 +2,9 @@ import React, {useState} from "react"
 import ReactMarkdown from 'react-markdown'
 import {Liquid} from "liquidjs"
 import {template} from "../templates/letter.tpl.js"
-import opolisData from "../templates/example-data.json"
 import './LetterToTrustedPerson.css'
 
-const LetterToTrustedPerson = () => (
+const LetterToTrustedPerson = ({docProps}) => (
     <div className='letter'>
         <header>
             <h1>Letter to Trusted Person</h1>
@@ -25,7 +24,7 @@ const LetterToTrustedPerson = () => (
             </ul>
         </div>
         <div className='renderedDocument'>
-            <RenderTemplate template={template} data={opolisData}/>
+            <RenderTemplate template={template} data={docProps}/>
         </div>
     </div>
 )
@@ -37,9 +36,10 @@ engine.registerFilter('money', new Intl.NumberFormat('en-US', {
 }).format)
 engine.registerFilter('redactedOrBold', v => '**' + (v ? v : "<redacted>") + '**')
 
-const RenderTemplate = ({template, data}) => {
+const RenderTemplate = ({template, data}) =>  {
     const [filled, setFilled] = useState('loading...')
-    engine.parseAndRender(template, data).then(setFilled)
+    engine.parseAndRender(template, data) // TODO Remove repeated  redactions
+        .then(setFilled)
     return <ReactMarkdown children={filled}/>
 }
 
