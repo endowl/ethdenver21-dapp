@@ -90,6 +90,7 @@ function Alice() {
             // NOTE: identity is still null at this point but get's updated asynchronously?
             console.log("identity", identity);
             console.log("id", id);
+            console.log("public key", id.public.toString());
 
             // getBucketKey
             if (!id) {
