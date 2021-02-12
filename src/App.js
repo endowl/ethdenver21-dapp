@@ -83,6 +83,7 @@ function App() {
 }
 
 let deadSetter;
+let props ={};
 
 function Owlfred() {
     return (
@@ -123,6 +124,7 @@ function Alice() {
 
     const [docProps, setDocProps] = useState(Object.assign({}, aliceOpolisData))
     deadSetter = () => setDocProps(set(docProps, "member.isDeceased", true))
+    props = docProps
 
     useEffect(() => {
         async function doAsyncStuff() {
@@ -301,6 +303,7 @@ function Alice() {
             </header>
             <OpolisDataModal
                 show={show}
+                showForm={true}
                 handleClose={handleClose}
                 docProps={docProps}
                 setState={setState}
@@ -317,11 +320,7 @@ function Bob() {
 
     // TODO: Demo REDACTED data while Alice is still alive
     // TODO: Pull this data from Textile bucket and decrypt it
-    const [docProps, setDocProps] = useState({
-        full_name: 'Alice Finnegan',
-        policy: 420523000111,
-        life_insurance_coverage: "$10,000,000",
-    });
+    // const [docProps, setDocProps] = useState(docProps);
 
     return (
         <>
@@ -345,26 +344,12 @@ function Bob() {
                     Open Alice's post-mortem document encrypted for Bob:
                 </p>
             </header>
-            <Modal show={show} onHide={handleClose} size="lg" centered>
-                <Modal.Header closeButton>
-                    <Modal.Title>Opolis Policy Details</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <code>
-                        <strong>{docProps.full_name}</strong> is a customer of Opolis with policy # <strong>{docProps.policy}</strong>.<br />
-                        Life insurance coverage is held in the amount of <strong>{docProps.life_insurance_coverage}</strong>.<br />
-                        {/*Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.*/}
-                    </code>
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save Changes
-                    </Button>
-                </Modal.Footer>
-            </Modal>
+            <OpolisDataModal
+                show={show}
+                showForm={false}
+                handleClose={handleClose}
+                docProps={props}
+            />
         </>
     )
 }
