@@ -32,7 +32,28 @@ function App() {
     return (
         <Router>
             <div className="App">
-                <h1><Link to="/">Team Alfred Demo</Link></h1>
+                <h1>
+                    <Link to="/">Team Alfred Demo</Link>
+                    <table style={{margin: "0 auto"}}>
+                        <tr>
+                            <td>
+                        <Link to="/owlfred">
+                            <img src={owlfred} style={{height: "50px", width: "auto"}} />
+                        </Link>
+                            </td>
+                            <td>
+                        <Link to="/alice">
+                            <img src={owlalice} style={{height: "50px", width: "auto"}} />
+                        </Link>
+                            </td>
+                            <td>
+                        <Link to="/bob">
+                            <img src={owlbob} style={{height: "50px", width: "auto"}} />
+                        </Link>
+                            </td>
+                        </tr>
+                    </table>
+                </h1>
 
                 <Switch>
                     <Route path="/owlfred">
@@ -309,9 +330,15 @@ function Bob() {
 function Home() {
     return (
         <header className="App-header">
-            <Link to="/owlfred">Owlfred</Link>
-            <Link to="/alice">Alice</Link>
-            <Link to="/bob">Bob</Link>
+            <Link to="/owlfred">
+                <img src={owlfred} style={{height: "50px", width: "auto"}} /> Owlfred
+            </Link>
+            <Link to="/alice">
+                <img src={owlalice} style={{height: "50px", width: "auto"}} /> Alice
+            </Link>
+            <Link to="/bob">
+                <img src={owlbob} style={{height: "50px", width: "auto"}} /> Bob
+            </Link>
         </header>
     )
 }
