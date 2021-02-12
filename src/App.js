@@ -9,7 +9,7 @@ import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
 // import hub from '@textile/hub'
 import {Buckets, Client, PrivateKey} from '@textile/hub';
 import {useEffect, useState} from "react";
-import {Button, Form} from "react-bootstrap";
+import {Button, Collapse, Form} from "react-bootstrap";
 
 const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
@@ -94,8 +94,23 @@ function Alice() {
     const [buckets, setBuckets] = useState(null);
     const [bucketKey, setBucketKey] = useState(null);
 
+    const [aliceBucketMockup, setAliceBucketMockup] = useState(0);
+
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+
+    const aliceMockup1 = () => {
+        setAliceBucketMockup(1);
+    }
+    const aliceMockup2 = () => {
+        setAliceBucketMockup(2);
+    }
+    const aliceMockup3 = () => {
+        setAliceBucketMockup(3);
+    }
+    const aliceMockup4 = () => {
+        setAliceBucketMockup(4);
+    }
 
     const [docProps, setDocProps] = useState({
         full_name: 'Alice Finnegan',
@@ -138,7 +153,6 @@ function Alice() {
             }
             try {
                 // TODO: Set path to the name of a file expected to be in Alice's bucket
-
                 let path = 'index.json';
                 const metadata = buckets.pullPath(buck.root.key, path)
                 const { value } = await metadata.next();
@@ -210,24 +224,71 @@ function Alice() {
                 </Button>
 
                 <p>
-                    Save Alice's encrypted document to Textile bucket
+                    Save Alice's encrypted documents to Textile bucket.
                 </p>
+                <Button onClick={aliceMockup1}>
+                    Store on Textile
+                </Button>
 
                 <p>
-                    Re-encrypt living document for Bob:
+                    {/*Encrypt living document for Bob.*/}
+                    Share living document with Bob.
                 </p>
+                <Button onClick={aliceMockup2}>
+                    Share with Bob
+                </Button>
 
                 <p>
-                    Re-encrypt post-mortem document for Bob:
+                    Save proxy re-encryption keys with Owlfred.
                 </p>
+                <Button onClick={aliceMockup3}>
+                    Save proxy key
+                </Button>
+                <Collapse in={aliceBucketMockup >=3}>
+                    <h5><i>Proxy re-encryption keys saved with Owlfred</i></h5>
+                </Collapse>
 
                 <p>
-                    Save re-encryption keys with Alfred:
+                    Re-encrypt post-mortem document for Bob when appropriate.
                 </p>
+                <Button onClick={aliceMockup4}>
+                    Re-encrypt for Bob
+                </Button>
 
-                {/*<img src={logo} className="App-logo" alt="logo" style={{maxWidth:"200px", height:"auto"}} />*/}
-                {/*<img src={logo} className="App-logo" alt="logo" />*/}
+                <br/>
+
+                <div className="container">
+                    <div className="row">
+                        <div className="col col-md-6">
+                            <div style={{backgroundColor: "white", color: "#282c34", borderRadius: "25px"}}>
+                                Alice's Textile Bucket:<br />
+                                <Collapse in={aliceBucketMockup >= 1}>
+                                    <ul>
+                                        <li id="doc_living">Opolis Policy, Living Data</li>
+                                        <li id="doc_dead">Opolis Policy, Post Mortem Data</li>
+                                    </ul>
+                                </Collapse>
+                            </div>
+                        </div>
+                        <div className="col col-md-6">
+                            <div style={{backgroundColor: "white", color: "#282c34", borderRadius: "25px"}}>
+                                Bob's Textile Bucket:<br />
+                                <Collapse in={aliceBucketMockup >= 2}>
+                                    <ul>
+                                        <li id="doc_living">Alice's Policy, Living Data</li>
+                                    </ul>
+                                </Collapse>
+                                <Collapse in={aliceBucketMockup >= 4}>
+                                    <ul>
+                                        <li id="doc_living">Alice's Policy, Post Mortem Data</li>
+                                    </ul>
+                                </Collapse>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </header>
+
             <Modal show={show} onHide={handleClose} size="lg" centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Opolis Policy Details</Modal.Title>
