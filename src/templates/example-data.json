@@ -50,5 +50,13 @@
         "phone": "(877) 867-5309"
       }
     }
+  },
+  "wallet": {
+    "device": {
+      "name": "Ledger Hardware Wallet",
+      "location": "top drawer of my desk",
+      "pin": "923745"
+    },
+    "private-key": "3gd5wvxohmvj5ctgzfontxeowzedixqhfje4776he5tfkfc5u"
   }
 }

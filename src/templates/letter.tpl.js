@@ -18,7 +18,9 @@ I have a life insurance policy that covers in the amount of {{benefits.term-life
 {% endif %}
 
 {% if member.isDeceased %}
-Opolis should already have been notified that I have passed away. Please call them to confirm that they have cancelled all of my benefits and that they have updated my account in their system.
+Opolis should already have been notified that I have passed away. Please call them to confirm that they have cancelled all of my benefits and that they have updated my account in their system. 
+{% if wallet.device %}If they need for you to provide a digital signature, my ethereum key is stored on the {{wallet.device.name| redactedOrBold}} that I keep in {{wallet.device.location| redactedOrBold}}. The access PIN for my wallet is {{wallet.device.pin| redactedOrBold}}. 
+{% if wallet.private-key %}If that fails, you can recover my Ethereum private key to anther wallet. It is {{wallet.private-key| redactedOrBold}}.{% endif %}{% endif %}
 {% endif %}
 
 If you have any questions about any this information or issues claiming my insurance benefits, please contact {{opolis.contact.name| redactedOrBold }} at {{opolis.contact.phone| redactedOrBold }}. My Opolis membership is id {{member.id| redactedOrBold }}.
