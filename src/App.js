@@ -13,6 +13,7 @@ import {Button, Collapse, Form} from "react-bootstrap";
 import LetterToTrustedPerson from "./components/LetterToTrustedPerson";
 import {set} from "lodash"
 import OpolisDataModal from "./components/OpolisDataModal";
+import aliceOpolisData from "./templates/example-data.json"
 
 const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
@@ -118,68 +119,7 @@ function Alice() {
         setAliceBucketMockup(4);
     }
 
-    const [docProps, setDocProps] = useState({
-        "trusted-person": {
-            "name": "Bobby McGee"
-        },
-        "member": {
-            "id": "22918",
-            "name": "Alice Wonderland",
-            "isDeceased": true
-        },
-        "opolis": {
-            "contact": {
-                "name": "John Paller",
-                "phone": "(505) 505-0505"
-            }
-        },
-        "benefits": {
-            "short-term-disability": {
-                "percentage": 0.6,
-                "startdays": 14,
-                "enddays": 84,
-                "insurer": "Great American Mutual Insurance Company",
-                "policy-number": "23H98D3",
-                "group-number": "0001",
-                "claims-agent": {
-                    "name": "Alec Eiffel",
-                    "phone": "(866) 555-9876"
-                }
-            },
-            "long-term-disability": {
-                "percentage": 0.4,
-                "startdays": 85,
-                "enddays": 730,
-                "insurer": "American Mutual Insurance Company Group",
-                "policy-number": "2H9833D",
-                "group-number": "0001",
-                "claims-agent": {
-                    "name": "Nikki Wendal",
-                    "phone": "(888) 555-6789"
-                }
-            },
-            "term-life": {
-                "amount": 250000,
-                "policy-number": "OICU812",
-                "insurer": "Mutual Insurance Group of Omaha",
-                "beneficary": {
-                    "name": "Mary Jane McGee"
-                },
-                "claims-agent": {
-                    "name": "Tom Major",
-                    "phone": "(877) 867-5309"
-                }
-            }
-        },
-        "wallet": {
-            "device": {
-                "name": "Ledger Hardware Wallet",
-                "location": "top drawer of my desk",
-                "pin": "923745"
-            },
-            "private-key": "3gd5wvxohmvj5ctgzfontxeowzedixqhfje4776he5tfkfc5u"
-        }
-    });
+    const [docProps, setDocProps] = useState(Object.assign({}, aliceOpolisData))
 
     useEffect(() => {
         async function doAsyncStuff() {
@@ -290,10 +230,6 @@ function Alice() {
                 <Button variant="primary" onClick={handleShow}>
                     Opolis Policy Details
                 </Button>
-            <ul>
-                <li><a href="#" aria-disabled>Last Will &amp; Testament ** Coming Soon **</a></li>
-                <li><Link to="/letter-to-trusted-person">Letter to trusted person about Opolis</Link></li>
-            </ul>
 
                 <p>
                     Save Alice's encrypted documents to Textile bucket.

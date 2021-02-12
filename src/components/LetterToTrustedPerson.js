@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import {Liquid} from "liquidjs"
 import {template} from "../templates/letter.tpl.js"
 import './LetterToTrustedPerson.css'
+import RenderTemplate from "./RenderTemplate";
 
 const LetterToTrustedPerson = ({docProps}) => (
     <div className='letter'>
@@ -28,20 +29,6 @@ const LetterToTrustedPerson = ({docProps}) => (
         </div>
     </div>
 )
-
-const engine = new Liquid()
-engine.registerFilter('money', new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-}).format)
-engine.registerFilter('redactedOrBold', v => '**' + (v ? v : "<redacted>") + '**')
-
-const RenderTemplate = ({template, data}) =>  {
-    const [filled, setFilled] = useState('loading...')
-    engine.parseAndRender(template, data) // TODO Remove repeated  redactions
-        .then(setFilled)
-    return <ReactMarkdown children={filled}/>
-}
 
 export default LetterToTrustedPerson
 

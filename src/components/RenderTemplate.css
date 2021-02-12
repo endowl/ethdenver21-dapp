@@ -1,0 +1,17 @@
+.renderedDocument {
+    width: 600px;
+    height: 835px;
+    margin: 1cm auto;
+    background: #fff;
+    box-shadow: 0 4px 5px rgb(75 75 75 / 20%);
+    border: rgb(75 75 75 / 20%) 1px solid;
+    outline: 0;
+    color: black;
+    font-size: 11px;
+    text-align: left;
+    padding: 75px;
+}
+
+.renderedDocument h2 {
+    font-size: 13px;
+}
