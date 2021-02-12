@@ -7,13 +7,20 @@ import owlbob from './owlbob/alfred.svg';
 import './App.css';
 import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
 // import hub from '@textile/hub'
-import {Client} from '@textile/hub';
-import {useState} from "react";
+import {Buckets, Client, PrivateKey} from '@textile/hub';
+import {useEffect, useState} from "react";
 import {Button, Form} from "react-bootstrap";
 
-const keyinfo = {
+const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
 }
+const keyInfoOptions = {
+    debug: false
+}
+
+// TODO: NOT THIS!!!
+// const ALICE_PRIVATE = "bbaareqgk3j7dtk733p7qt5zwf6i34ghu2adghr36v6j6w2pkhgdszazhb55e3gd5wvxohmvj5ctgzfontxeowzedixqhfje4776he5tfkfc5u";
+// const ALICE_KEY = "bbaareid2jwmh3nlo4ozkt2fgnsk43hoi5nsigrpaoksjz774oj3gkukf3i"
 
 async function authorize (key, identity) {
   const client = await Client.withKeyInfo(key)
@@ -62,6 +69,9 @@ function Owlfred() {
 
 function Alice() {
     const [show, setShow] = useState(false);
+    const [identity, setIdentity] = useState(null)
+    const [buckets, setBuckets] = useState(null);
+    const [bucketKey, setBucketKey] = useState(null);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -71,6 +81,97 @@ function Alice() {
         policy: 420523000111,
         life_insurance_coverage: "$10,000,000",
     });
+
+    useEffect(() => {
+        async function doAsyncStuff() {
+            // localStorage.clear(); // TODO: Remove this after debugging
+            let id = getIdentity("alice");
+            setIdentity(id);
+            // NOTE: identity is still null at this point but get's updated asynchronously?
+            console.log("identity", identity);
+            console.log("id", id);
+
+            // getBucketKey
+            if (!id) {
+                throw new Error('Identity not set')
+            }
+            const buckets = await Buckets.withKeyInfo(keyInfo, keyInfoOptions)
+            // Authorize the user and your insecure keys with getToken
+            await buckets.getToken(id)
+
+            // const buck = await buckets.getOrCreate('io.textile.dropzone')
+            const buck = await buckets.getOrCreate('com.endowl.dropzone')
+            if (!buck.root) {
+                throw new Error('Failed to open bucket')
+            }
+            console.log("buckets", buckets);
+            console.log("bucketKey", buck.root.key);
+            setBuckets(buckets);
+            setBucketKey(buck.root.key);
+            // return {buckets: buckets, bucketKey: buck.root.key};
+
+            if(!buckets || !buck.root.key) {
+                console.error("No bucket client or root key");
+                return;
+            }
+            try {
+                // TODO: Set path to the name of a file expected to be in Alice's bucket
+
+                let path = 'index.json';
+                const metadata = buckets.pullPath(buck.root.key, path)
+                const { value } = await metadata.next();
+                let str = "";
+                for (var i = 0; i < value.length; i++) {
+                    str += String.fromCharCode(parseInt(value[i]));
+                }
+                const index = JSON.parse(str)
+                console.log("index", index);
+                // return index
+            } catch (error) {
+                console.log("Error loading file from bucket")
+            //     const index = await initIndex()
+            //     await initPublicGallery()
+            //     return index
+            }
+        }
+
+        doAsyncStuff();
+    }, [])
+
+    /**
+     * getIdentity uses a basic private key identity.
+     * The user's identity will be cached client side. This is long
+     * but ephemeral storage not sufficient for production apps.
+     *
+     * Read more here:
+     * https://docs.textile.io/tutorials/hub/libp2p-identities/
+     */
+    // async function getIdentity(who) {
+    function getIdentity(who) {
+        const storageKey = "identity_" + who;
+        try {
+            var storedIdent = localStorage.getItem(storageKey);
+            if (storedIdent === null) {
+                throw new Error('No identity')
+            }
+            const restored = PrivateKey.fromString(storedIdent)
+            return restored
+        }
+        catch (e) {
+            /**
+             * If any error, create a new identity.
+             */
+            try {
+                const identity = PrivateKey.fromRandom()
+                const identityString = identity.toString()
+                localStorage.setItem(storageKey, identityString)
+                return identity
+            } catch (err) {
+                return err.message
+            }
+        }
+    }
+
 
     return (
         <>
