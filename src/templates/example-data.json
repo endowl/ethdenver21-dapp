@@ -1,0 +1,54 @@
+{
+  "trusted-person": {
+    "name": "Bobby McGee"
+  },
+  "member": {
+    "id": "22918",
+    "name": "Alice Wonderland",
+    "isDeceased": true
+  },
+  "opolis": {
+    "contact": {
+      "name": "John Paller",
+      "phone": "(505) 505-0505"
+    }
+  },
+  "benefits": {
+    "short-term-disability": {
+      "percentage": 0.6,
+      "startdays": 14,
+      "enddays": 84,
+      "insurer": "Great American Mutual Insurance Company",
+      "policy-number": "23H98D3",
+      "group-number": "0001",
+      "claims-agent": {
+        "name": "Alec Eiffel",
+        "phone": "(866) 555-9876"
+      }
+    },
+    "long-term-disability": {
+      "percentage": 0.4,
+      "startdays": 85,
+      "enddays": 730,
+      "insurer": "American Mutual Insurance Company Group",
+      "policy-number": "2H9833D",
+      "group-number": "0001",
+      "claims-agent": {
+        "name": "Nikki Wendal",
+        "phone": "(888) 555-6789"
+      }
+    },
+    "term-life": {
+      "amount": 250000,
+      "policy-number": "OICU812",
+      "insurer": "Mutual Insurance Group of Omaha",
+      "beneficary": {
+        "name": "Mary Jane McGee"
+      },
+      "claims-agent": {
+        "name": "Tom Major",
+        "phone": "(877) 867-5309"
+      }
+    }
+  }
+}

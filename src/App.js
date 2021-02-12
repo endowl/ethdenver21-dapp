@@ -10,6 +10,7 @@ import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
 import {Buckets, Client, PrivateKey} from '@textile/hub';
 import {useEffect, useState} from "react";
 import {Button, Collapse, Form} from "react-bootstrap";
+import LetterToTrustedPerson from "./components/LetterToTrustedPerson";
 
 const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
@@ -64,6 +65,9 @@ function App() {
                     </Route>
                     <Route path="/bob">
                         <Bob />
+                    </Route>
+                    <Route path="/letter-to-trusted-person">
+                        <LetterToTrustedPerson />
                     </Route>
                     <Route path="/">
                         <Home />
@@ -222,6 +226,10 @@ function Alice() {
                 <Button variant="primary" onClick={handleShow}>
                     Opolis Policy Details
                 </Button>
+            <ul>
+                <li><a href="#" aria-disabled>Last Will &amp; Testament ** Coming Soon **</a></li>
+                <li><Link to="/letter-to-trusted-person">Letter to trusted person about Opolis</Link></li>
+            </ul>
 
                 <p>
                     Save Alice's encrypted documents to Textile bucket.

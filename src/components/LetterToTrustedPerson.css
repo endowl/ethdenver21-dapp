@@ -1,0 +1,30 @@
+.letter {
+    background-color: #282c34;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(10px + 2vmin);
+    color: white;
+}
+.instructions {
+    text-align: left;
+    width: 800px;
+}
+.renderedDocument {
+    width: 600px;
+    height: 835px;
+    margin: 1cm auto;
+    background: #fff;
+    box-shadow: 0 4px 5px rgb(75 75 75 / 20%);
+    outline: 0;
+    color: black;
+    font-size: 11px;
+    text-align: left;
+    padding: 75px;
+}
+
+.renderedDocument h2 {
+    font-size: 13px;
+}
