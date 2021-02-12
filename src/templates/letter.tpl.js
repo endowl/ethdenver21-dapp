@@ -16,7 +16,7 @@ I have a short term disability policy that covers {{ benefits.long-term-disabili
 {{undefined | redactedOrBold}}
 {% endif %}
 
-{% if benefits.term-life && member.isDeceased %}
+{% if benefits.term-life and member.isDeceased %}
 ## Life Insurance
 I have a life insurance policy that covers in the amount of {{benefits.term-life.amount | money | redactedOrBold }}. {{benefits.term-life.beneficary.name| redactedOrBold }} has been designated as my beneficiary. The insurance company that provides the coverage is {{benefits.term-life.insurer| redactedOrBold }}. The policy number is {{benefits.term-life.policy-number| redactedOrBold }}. Please help {{benefits.term-life.beneficary.name| redactedOrBold }} contact {{benefits.term-life.claims-agent.name| redactedOrBold }} at {{benefits.term-life.claims-agent.phone| redactedOrBold }} to claim this benefits.
 {% else %}

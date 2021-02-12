@@ -1,9 +1,10 @@
 import React, {useState} from "react";
 
-const Upload = ({}) => {
+const Upload = ({deadSetter}) => {
     const [image, setImage] = useState()
     const handleChange = ({target: {files}}) => {
         setImage(URL.createObjectURL(files[0]))
+        deadSetter()
     }
 
     return (

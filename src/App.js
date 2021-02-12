@@ -82,6 +82,8 @@ function App() {
     );
 }
 
+let deadSetter;
+
 function Owlfred() {
     return (
         <header className="App-header">
@@ -89,7 +91,7 @@ function Owlfred() {
             <img src={owlfred} className="App-logo" alt="logo" style={{maxWidth:"200px", height:"auto"}} />
             <p>
                 Submit death certificate.<br />
-                <Upload/>
+                <Upload deadSetter={deadSetter}/>
             </p>
         </header>
     )
@@ -120,6 +122,7 @@ function Alice() {
     }
 
     const [docProps, setDocProps] = useState(Object.assign({}, aliceOpolisData))
+    deadSetter = () => setDocProps(set(docProps, "member.isDeceased", true))
 
     useEffect(() => {
         async function doAsyncStuff() {
