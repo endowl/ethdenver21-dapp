@@ -14,6 +14,7 @@ import LetterToTrustedPerson from "./components/LetterToTrustedPerson";
 import {set} from "lodash"
 import OpolisDataModal from "./components/OpolisDataModal";
 import aliceOpolisData from "./templates/example-data.json"
+import Upload from "./components/Upload";
 
 const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
@@ -88,8 +89,7 @@ function Owlfred() {
             <img src={owlfred} className="App-logo" alt="logo" style={{maxWidth:"200px", height:"auto"}} />
             <p>
                 Submit death certificate.<br />
-                <input type="file" />
-                <input type="button" value="Sign &amp; Submit" />
+                <Upload/>
             </p>
         </header>
     )
