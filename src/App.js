@@ -66,6 +66,12 @@ function Alice() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
+    const [docProps, setDocProps] = useState({
+        full_name: 'Alice Finnegan',
+        policy: 420523000111,
+        life_insurance_coverage: "$10,000,000",
+    });
+
     return (
         <>
             <header className="App-header">
@@ -108,15 +114,21 @@ function Alice() {
                     <Form>
                         <Form.Group>
                             <Form.Label>Full Name</Form.Label>
-                            <Form.Control />
+                            <Form.Control value={docProps.full_name} onChange={event => setDocProps({...docProps, full_name: event.target.value})} />
                         </Form.Group>
                         <Form.Group>
                             <Form.Label>Policy #</Form.Label>
-                            <Form.Control />
+                            <Form.Control value={docProps.policy} onChange={event => setDocProps({...docProps, policy: event.target.value})} />
+                        </Form.Group>
+                        <Form.Group>
+                            <Form.Label>Life insurance coverage</Form.Label>
+                            <Form.Control value={docProps.life_insurance_coverage} onChange={event => setDocProps({...docProps, life_insurance_coverage: event.target.value})} />
                         </Form.Group>
                     </Form>
                     <code>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                        <strong>{docProps.full_name}</strong> is a customer of Opolis with policy # <strong>{docProps.policy}</strong>.<br />
+                        Life insurance coverage is held in the amount of <strong>{docProps.life_insurance_coverage}</strong>.<br />
+                        {/*Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.*/}
                     </code>
                 </Modal.Body>
                 <Modal.Footer>
@@ -132,36 +144,63 @@ function Alice() {
     )
 }
 
-function AliceEditDoc() {
-    return (
-        <header className="App-header">
-
-        </header>
-    )
-}
-
 function Bob() {
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    // TODO: Demo REDACTED data while Alice is still alive
+    // TODO: Pull this data from Textile bucket and decrypt it
+    const [docProps, setDocProps] = useState({
+        full_name: 'Alice Finnegan',
+        policy: 420523000111,
+        life_insurance_coverage: "$10,000,000",
+    });
+
     return (
-        <header className="App-header">
-            <h1>Bob the Beneficiary</h1>
+        <>
+            <header className="App-header">
+                <h1>Bob the Beneficiary</h1>
 
-            <img src={owlbob} className="App-logo" alt="logo" style={{maxWidth:"200px", height:"auto"}} />
+                <img src={owlbob} className="App-logo" alt="logo" style={{maxWidth:"200px", height:"auto"}} />
 
-            <p>
-                Open Alice's document encrypted for Bob from Textile bucket
-            </p>
-            <ul>
-                <li><a href="#">Last Will &amp; Testament</a></li>
-            </ul>
+                <p>
+                    Open Alice's document encrypted for Bob from Textile bucket
+                </p>
+                <Button variant="primary" onClick={handleShow}>
+                    Opolis Policy Details
+                </Button>
 
-            <p>
-                Request Alfred deliver Alice's post-mortem document encrypted for Bob:
-            </p>
+                <p>
+                    Request Alfred deliver Alice's post-mortem document encrypted for Bob:
+                </p>
 
-            <p>
-                Open Alice's post-mortem document encrypted for Bob:
-            </p>
-        </header>
+                <p>
+                    Open Alice's post-mortem document encrypted for Bob:
+                </p>
+            </header>
+            <Modal show={show} onHide={handleClose} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Opolis Policy Details</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <code>
+                        <strong>{docProps.full_name}</strong> is a customer of Opolis with policy # <strong>{docProps.policy}</strong>.<br />
+                        Life insurance coverage is held in the amount of <strong>{docProps.life_insurance_coverage}</strong>.<br />
+                        {/*Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.*/}
+                    </code>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleClose}>
+                        Save Changes
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </>
     )
 }
 
