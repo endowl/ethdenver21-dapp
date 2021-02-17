@@ -202,36 +202,39 @@ function Alice() {
     useEffect(() => {
         async function doAsyncStuff() {
             // localStorage.clear(); // TODO: Remove this after debugging
+
+            // Setup basic user identity
             let id = getIdentity("alice");
             setIdentity(id);
             console.log("identity", identity);
             console.log("id", id);
             // NOTE: identity is still null at this point but gets updated asynchronously?
             console.log("public key", id.public.toString());
-
-            // getBucketKey
             if (!id) {
                 throw new Error('Identity not set')
             }
 
+            // Perform basic development auth
+            // TODO: Implement production auth
             const client = await authorize(keyInfo, id);
-
             console.log("client", client);
 
+            // Fetch bucket details
             const {buckets, bucketKey} = await setup(keyInfo, id);
-
             console.log("buckets", buckets);
             console.log("bucketKey", bucketKey);
 
-            /*
-            setBuckets(buckets);
-            setBucketKey(buck.root.key);
-            // return {buckets: buckets, bucketKey: buck.root.key};
+            // Push a file to the Bucket
+            const path = "testfile"
+            const string = "Hello world!"
+            const binaryStr = new TextEncoder().encode(string);
+            const raw = await buckets.pushPath(bucketKey, path, binaryStr)
 
-            if(!buckets || !buck.root.key) {
-                console.error("No bucket client or root key");
-                return;
-            }
+            console.log("raw", raw);
+
+
+
+            /*
             try {
                 // TODO: Set path to the name of a file expected to be in Alice's bucket
                 let path = 'index.json';
