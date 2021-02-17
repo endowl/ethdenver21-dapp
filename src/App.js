@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Modal from 'react-bootstrap/Modal';
+// import Modal from 'react-bootstrap/Modal';
 // import logo from './endowl-logo.png';
 import owlfred from './owlfred/alfred.svg';
 import owlalice from './owlalice/alfred.svg';
@@ -9,7 +9,7 @@ import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
 // import hub from '@textile/hub'
 import {Buckets, Client, PrivateKey} from '@textile/hub';
 import {useEffect, useState} from "react";
-import {Button, Collapse, Form} from "react-bootstrap";
+import {Button, Collapse} from "react-bootstrap";
 import LetterToTrustedPerson from "./components/LetterToTrustedPerson";
 import {set} from "lodash"
 import OpolisDataModal from "./components/OpolisDataModal";
@@ -40,23 +40,25 @@ function App() {
                 <h1>
                     <Link to="/">Team Alfred Demo</Link>
                     <table style={{margin: "0 auto"}}>
-                        <tr>
-                            <td>
-                        <Link to="/owlfred">
-                            <img src={owlfred} style={{height: "50px", width: "auto"}} />
-                        </Link>
-                            </td>
-                            <td>
-                        <Link to="/alice">
-                            <img src={owlalice} style={{height: "50px", width: "auto"}} />
-                        </Link>
-                            </td>
-                            <td>
-                        <Link to="/bob">
-                            <img src={owlbob} style={{height: "50px", width: "auto"}} />
-                        </Link>
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr>
+                                <td>
+                            <Link to="/owlfred">
+                                <img src={owlfred} alt="Owlfred" style={{height: "50px", width: "auto"}} />
+                            </Link>
+                                </td>
+                                <td>
+                            <Link to="/alice">
+                                <img src={owlalice} alt="Alice" style={{height: "50px", width: "auto"}} />
+                            </Link>
+                                </td>
+                                <td>
+                            <Link to="/bob">
+                                <img src={owlbob} alt="Bob" style={{height: "50px", width: "auto"}} />
+                            </Link>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </h1>
 
@@ -131,9 +133,9 @@ function Alice() {
             // localStorage.clear(); // TODO: Remove this after debugging
             let id = getIdentity("alice");
             setIdentity(id);
-            // NOTE: identity is still null at this point but get's updated asynchronously?
             console.log("identity", identity);
             console.log("id", id);
+            // NOTE: identity is still null at this point but gets updated asynchronously?
             console.log("public key", id.public.toString());
 
             // getBucketKey
@@ -358,13 +360,13 @@ function Home() {
     return (
         <header className="App-header">
             <Link to="/owlfred">
-                <img src={owlfred} style={{height: "50px", width: "auto"}} /> Owlfred
+                <img src={owlfred} alt="Owlfred" style={{height: "50px", width: "auto"}} /> Owlfred
             </Link>
             <Link to="/alice">
-                <img src={owlalice} style={{height: "50px", width: "auto"}} /> Alice
+                <img src={owlalice} alt="Alice" style={{height: "50px", width: "auto"}} /> Alice
             </Link>
             <Link to="/bob">
-                <img src={owlbob} style={{height: "50px", width: "auto"}} /> Bob
+                <img src={owlbob} alt="Bob" style={{height: "50px", width: "auto"}} /> Bob
             </Link>
         </header>
     )

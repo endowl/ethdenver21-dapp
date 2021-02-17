@@ -8,10 +8,10 @@ const Upload = ({deadSetter}) => {
     }
 
     return (
-        <div>
+        <>
             <input type="file" onChange={handleChange}/><br/>
-            <img style={{margin: "30px", width: "400px"}} src={image}/>
-        </div>
+            <img alt="" style={{margin: "30px", width: "400px"}} src={image}/>
+        </>
     )
 }
 
