@@ -16,6 +16,8 @@ import OpolisDataModal from "./components/OpolisDataModal";
 import aliceOpolisData from "./templates/example-data.json"
 import Upload from "./components/Upload";
 
+// TODO: stop using "insecure keys" method for development, switch to production authentication:
+//       https://docs.textile.io/tutorials/hub/production-auth/
 const keyInfo = {
   key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
 }
@@ -23,14 +25,83 @@ const keyInfoOptions = {
     debug: false
 }
 
-// TODO: NOT THIS!!!
-// const ALICE_PRIVATE = "bbaareqgk3j7dtk733p7qt5zwf6i34ghu2adghr36v6j6w2pkhgdszazhb55e3gd5wvxohmvj5ctgzfontxeowzedixqhfje4776he5tfkfc5u";
-// const ALICE_KEY = "bbaareid2jwmh3nlo4ozkt2fgnsk43hoi5nsigrpaoksjz774oj3gkukf3i"
+/**
+ * getIdentity uses a basic private key identity.
+ * The user's identity will be cached client side. This is long
+ * but ephemeral storage not sufficient for production apps.
+ *
+ * Read more here:
+ * https://docs.textile.io/tutorials/hub/libp2p-identities/
+ */
+// async function getIdentity(who) {
+function getIdentity(who) {
+    // TODO: Generate identity (and in affect private key) using a non-random method
+    const localStorageKey = "textile.identity." + who;
+    try {
+        var storedIdent = localStorage.getItem(localStorageKey);
+        if (storedIdent === null) {
+            throw new Error('No identity')
+        }
+        const restored = PrivateKey.fromString(storedIdent)
+        console.log("Textile identity loaded from local storage")
+        return restored
+    }
+    catch (e) {
+        /**
+         * If any error, create a new identity.
+         */
+        try {
+            const identity = PrivateKey.fromRandom()
+            const identityString = identity.toString()
+            console.log("Textile identity created from random seed")
+            localStorage.setItem(localStorageKey, identityString)
+            console.log("Textile identity saved to local storage")
+            return identity
+        } catch (err) {
+            return err.message
+        }
+    }
+}
+
 
 async function authorize (key, identity) {
   const client = await Client.withKeyInfo(key)
   await client.getToken(identity)
   return client
+}
+
+async function setup (key, identity) {
+  // Use the insecure key to set up the buckets client
+  const buckets = await Buckets.withKeyInfo(key)
+  // Authorize the user and your insecure keys with getToken
+  await buckets.getToken(identity)
+
+  // const result = await buckets.open('com.endowl.ethdenver21')
+  const result = await buckets.getOrCreate('com.endowl.ethdenver21')
+  if (!result.root) {
+    throw new Error('Failed to open bucket')
+  }
+
+  return {
+      buckets: buckets,
+      bucketKey: result.root.key,
+  }
+}
+
+const insertFile = (buckets, bucketKey, file, path) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onabort = () => reject('file reading was aborted')
+    reader.onerror = () => reject('file reading has failed')
+    reader.onload = () => {
+      const binaryStr = reader.result
+      // Finally, push the full file to the bucket
+      buckets.pushPath(bucketKey, path, binaryStr).then((raw) => {
+        resolve(raw)
+      })
+    }
+    reader.readAsArrayBuffer(file)
+  })
 }
 
 function App() {
@@ -142,17 +213,17 @@ function Alice() {
             if (!id) {
                 throw new Error('Identity not set')
             }
-            const buckets = await Buckets.withKeyInfo(keyInfo, keyInfoOptions)
-            // Authorize the user and your insecure keys with getToken
-            await buckets.getToken(id)
 
-            // const buck = await buckets.getOrCreate('io.textile.dropzone')
-            const buck = await buckets.getOrCreate('com.endowl.dropzone')
-            if (!buck.root) {
-                throw new Error('Failed to open bucket')
-            }
+            const client = await authorize(keyInfo, id);
+
+            console.log("client", client);
+
+            const {buckets, bucketKey} = await setup(keyInfo, id);
+
             console.log("buckets", buckets);
-            console.log("bucketKey", buck.root.key);
+            console.log("bucketKey", bucketKey);
+
+            /*
             setBuckets(buckets);
             setBucketKey(buck.root.key);
             // return {buckets: buckets, bucketKey: buck.root.key};
@@ -180,44 +251,13 @@ function Alice() {
             //     await initPublicGallery()
             //     return index
             }
+
+             */
         }
 
         doAsyncStuff();
     }, [])
 
-    /**
-     * getIdentity uses a basic private key identity.
-     * The user's identity will be cached client side. This is long
-     * but ephemeral storage not sufficient for production apps.
-     *
-     * Read more here:
-     * https://docs.textile.io/tutorials/hub/libp2p-identities/
-     */
-    // async function getIdentity(who) {
-    function getIdentity(who) {
-        const storageKey = "identity_" + who;
-        try {
-            var storedIdent = localStorage.getItem(storageKey);
-            if (storedIdent === null) {
-                throw new Error('No identity')
-            }
-            const restored = PrivateKey.fromString(storedIdent)
-            return restored
-        }
-        catch (e) {
-            /**
-             * If any error, create a new identity.
-             */
-            try {
-                const identity = PrivateKey.fromRandom()
-                const identityString = identity.toString()
-                localStorage.setItem(storageKey, identityString)
-                return identity
-            } catch (err) {
-                return err.message
-            }
-        }
-    }
 
     const setState = path => ({target: {value}}) => {
         const newDocProps = set({...docProps}, path, value)
