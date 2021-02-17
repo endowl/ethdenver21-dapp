@@ -1,12 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import Modal from 'react-bootstrap/Modal';
 // import logo from './endowl-logo.png';
 import owlfred from './owlfred/alfred.svg';
 import owlalice from './owlalice/alfred.svg';
 import owlbob from './owlbob/alfred.svg';
 import './App.css';
 import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
-// import hub from '@textile/hub'
 import {Buckets, Client, PrivateKey} from '@textile/hub';
 import {useEffect, useState} from "react";
 import {Button, Collapse} from "react-bootstrap";
@@ -16,10 +14,11 @@ import OpolisDataModal from "./components/OpolisDataModal";
 import aliceOpolisData from "./templates/example-data.json"
 import Upload from "./components/Upload";
 
-// TODO: stop using "insecure keys" method for development, switch to production authentication:
+// TODO: Stop using "insecure keys" method for development, switch to production authentication:
 //       https://docs.textile.io/tutorials/hub/production-auth/
 const keyInfo = {
-  key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // 'INSECURE API KEY',
+  // key: 'bscp24bwolbgs7ciwbxkgsoh6a4',  // Morgan 'INSECURE API KEY',
+  key: 'b3xgautdgxk7orkk2m53avfteyi',  // Endowl 'INSECURE API KEY',
 }
 const keyInfoOptions = {
     debug: false
@@ -63,21 +62,24 @@ function getIdentity(who) {
     }
 }
 
-
-async function authorize (key, identity) {
+// Authenticate user on Textile with Endowl API keys
+async function authorizeTextileUser (key, identity) {
   const client = await Client.withKeyInfo(key)
   await client.getToken(identity)
   return client
 }
 
-async function setup (key, identity) {
+
+// Open or create user owned Textile Bucket
+async function setupBucket(key, identity) {
   // Use the insecure key to set up the buckets client
   const buckets = await Buckets.withKeyInfo(key)
-  // Authorize the user and your insecure keys with getToken
+  // Authorize the user and your insecure app key with getToken
   await buckets.getToken(identity)
 
   // const result = await buckets.open('com.endowl.ethdenver21')
-  const result = await buckets.getOrCreate('com.endowl.ethdenver21')
+    let bucketName = 'com.endowl.ethdenver21';
+    const result = await buckets.getOrCreate(bucketName)
   if (!result.root) {
     throw new Error('Failed to open bucket')
   }
@@ -203,7 +205,7 @@ function Alice() {
         async function doAsyncStuff() {
             // localStorage.clear(); // TODO: Remove this after debugging
 
-            // Setup basic user identity
+            // Setup basic user identity for Alice
             let id = getIdentity("alice");
             setIdentity(id);
             console.log("identity", identity);
@@ -214,13 +216,12 @@ function Alice() {
                 throw new Error('Identity not set')
             }
 
-            // Perform basic development auth
-            // TODO: Implement production auth
-            const client = await authorize(keyInfo, id);
+            // Perform basic development auth connecting Alice to Endowl API key
+            const client = await authorizeTextileUser(keyInfo, id);
             console.log("client", client);
 
-            // Fetch bucket details
-            const {buckets, bucketKey} = await setup(keyInfo, id);
+            // Open/create Bucket and fetch details
+            const {buckets, bucketKey} = await setupBucket(keyInfo, id);
             console.log("buckets", buckets);
             console.log("bucketKey", bucketKey);
 
@@ -232,30 +233,20 @@ function Alice() {
 
             console.log("raw", raw);
 
-
-
-            /*
+            // Read back test file from the Bucket
             try {
-                // TODO: Set path to the name of a file expected to be in Alice's bucket
-                let path = 'index.json';
-                const metadata = buckets.pullPath(buck.root.key, path)
-                const { value } = await metadata.next();
-                console.log(value)
+                const data = buckets.pullPath(bucketKey, path)
+                const { value } = await data.next();
+                console.log("data value", value)
                 let str = "";
-                for (var i = 0; i < value.length; i++) {
+                for (let i = 0; i < value.length; i++) {
                     str += String.fromCharCode(parseInt(value[i]));
                 }
-                const index = JSON.parse(str)
-                console.log("index", index);
-                // return index
-            } catch (error) {
-                console.log("Error loading file from bucket")
-            //     const index = await initIndex()
-            //     await initPublicGallery()
-            //     return index
-            }
+                console.log("str", str);
 
-             */
+            } catch (error) {
+                console.log("Error while loading file from bucket", error)
+            }
         }
 
         doAsyncStuff();

@@ -15,7 +15,7 @@ const RenderTemplate = ({template, data}) => {
     engine.parseAndRender(template, data) // TODO Remove repeated  redactions
         .then(setFilled)
     return (
-        <div class="renderedDocument">
+        <div className="renderedDocument">
             <ReactMarkdown children={filled}/>
         </div>
     )
