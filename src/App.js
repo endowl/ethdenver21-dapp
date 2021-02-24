@@ -119,7 +119,8 @@ function generateMessageForEntropy(ethereum_address, application_name, secret) {
         '******************************************************************************** \n' +
         'The Ethereum address used by this application is: \n' +
         '\n' +
-        ethereum_address.value +
+        // ethereum_address.value +
+        ethereum_address +
         '\n' +
         '\n' +
         '\n' +
@@ -220,6 +221,8 @@ function Owlfred() {
 function Alice() {
     const [show, setShow] = useState(false);
     const [identity, setIdentity] = useState(null)
+    const [loggedIn, setLoggedIn] = useState(false);
+    const [loggingIn, setLoggingIn] = useState(false);
     const [buckets, setBuckets] = useState(null);
     const [bucketKey, setBucketKey] = useState(null);
     const [identityPassword, setIdentityPassword] = useState("");
@@ -275,12 +278,19 @@ function Alice() {
         return {address, signer}
     }
 
-// async function generatePrivateKey(password) {
+    // async function generatePrivateKey(password) {
     const generatePrivateKey = async() => {
         const metamask = await getAddressAndSigner()
         // avoid sending the raw secret by hashing it first
-        const secret = hashSync(identityPassword, 10)
-        const message = generateMessageForEntropy(metamask.address, 'Endowl POC', secret)
+        console.log("metamask.address", metamask.address);  // TODO: Remove this
+        console.log("identityPassword", identityPassword);  // TODO: Remove this
+        // Do not use a randomized hashing mechanism, we want this password+wallet signature to always create the same keypair
+        // const secret = hashSync(identityPassword, 10)
+        // Use a hash function that for any given input always produces the same output.
+        let applicationName = 'Endowl MVP';
+        const secret = utils.keccak256(utils.solidityKeccak256(['string', 'string'], [identityPassword, applicationName]))
+        console.log("secret", secret);  // TODO: Remove this
+        const message = generateMessageForEntropy(metamask.address, applicationName, secret)
         const signedText = await metamask.signer.signMessage(message);
         const hash = utils.keccak256(signedText);
         if (hash === null) {
@@ -306,6 +316,16 @@ function Alice() {
 
         // Your app can now use this identity for generating a user Mailbox, Threads, Buckets, etc
         return identity
+    }
+
+    const loginTextile = async () => {
+        setLoggedIn(false);
+        setLoggingIn(true);
+        const identity = await generatePrivateKey();
+        setLoggingIn(false);
+        if(identity) {{
+            setLoggedIn(true);
+        }}
     }
 
 
@@ -377,9 +397,19 @@ function Alice() {
                     Login to Textile
                 </p>
                 <input type="text" placeholder="textile password" value={identityPassword} onChange={e => {setIdentityPassword(e.target.value)}} />
-                <Button variant="primary" onClick={generatePrivateKey}>
+                <Button variant="primary" onClick={loginTextile}>
                     Login with Metamask
                 </Button>
+                {loggingIn &&
+                    <p>
+                        Connecting...
+                    </p>
+                }
+                {loggedIn &&
+                    <p>
+                        Success!
+                    </p>
+                }
 
                 <p>
                     Create document from template:
