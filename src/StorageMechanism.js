@@ -57,6 +57,17 @@ class StorageMechanism {
             }
     }
 
+    clearIdentity = (who) => {
+            try {
+                const localStorageKey = this.localStoragePrefix + who;
+                localStorage.removeItem(localStorageKey);
+                console.log("Textile identity removed from local storage");
+                // return identity
+                return true;
+            } catch (err) {
+                return err.message
+            }
+    }
 
     // Authenticate user on Textile with Endowl API keys
     // async function authorizeTextileUser (key, identity) {
@@ -75,8 +86,7 @@ class StorageMechanism {
         // Authorize the user and your insecure app key with getToken
         await buckets.getToken(identity)
 
-        // const result = await buckets.open('com.endowl.ethdenver21')
-        let bucketName = 'com.endowl.ethdenver21';
+        let bucketName = 'com.endowl.mvp';
         const result = await buckets.getOrCreate(bucketName)
         if (!result.root) {
             throw new Error('Failed to open bucket')

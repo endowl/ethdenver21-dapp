@@ -5,9 +5,9 @@ import owlalice from './owlalice/alfred.svg';
 import owlbob from './owlbob/alfred.svg';
 import './App.css';
 import {BrowserRouter as Router, Link, Route, Switch} from "react-router-dom";
-import {Buckets, Client, PrivateKey} from '@textile/hub';
-import { BigNumber, providers, utils } from 'ethers'
-import { hashSync } from 'bcryptjs'
+// import {Buckets, Client, PrivateKey} from '@textile/hub';
+// import { BigNumber, providers, utils } from 'ethers'
+// import { hashSync } from 'bcryptjs'
 import {useEffect, useState} from "react";
 import {Button, Collapse} from "react-bootstrap";
 import LetterToTrustedPerson from "./components/LetterToTrustedPerson";
@@ -90,9 +90,8 @@ function Alice() {
     const [show, setShow] = useState(false);
     // const [identity, setIdentity] = useState(null)
     const who = "alice";
+    // TODO: getSavedIdentity(...) seems to get called more than once, address that (see "textile identity loaded" in console logs)
     const [identity, setIdentity] = useState(storage.getSavedIdentity(who))
-    const [loggedIn, setLoggedIn] = useState(false);
-    const [loggingIn, setLoggingIn] = useState(false);
     const [buckets, setBuckets] = useState(null);
     const [bucketKey, setBucketKey] = useState(null);
     const [identityPassword, setIdentityPassword] = useState("");
@@ -103,8 +102,38 @@ function Alice() {
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
 
-    const aliceMockup1 = () => {
+    const aliceMockup1 = async () => {
         setAliceBucketMockup(1);
+
+        // Push a file to the Bucket
+        console.log("Pushing a test file to Textile Bucket");
+        const path = "testfile"
+        const string = "Hello world!"
+        const binaryStr = new TextEncoder().encode(string);
+        const raw = await buckets.pushPath(bucketKey, path, binaryStr)
+
+        console.log("raw", raw);
+
+        // Read back test file from the Bucket
+        console.log("Reading test file from Textile Bucket");
+        try {
+            const data = buckets.pullPath(bucketKey, path)
+            const { value } = await data.next();
+            console.log("data value", value)
+            let str = "";
+            for (let i = 0; i < value.length; i++) {
+                str += String.fromCharCode(parseInt(value[i]));
+            }
+            console.log("str", str);
+
+        } catch (error) {
+            console.log("Error while loading file from bucket", error)
+        }
+
+
+        // storage.insertFile(buckets, bucketKey, './templates/output_test.md', 'output_test.md').then(result => {
+        //     console.log("Insert file result", result);
+        // });
     }
     const aliceMockup2 = () => {
         setAliceBucketMockup(2);
@@ -120,66 +149,46 @@ function Alice() {
     deadSetter = () => setDocProps(set(docProps, "member.isDeceased", true))
     props = docProps
 
-    const loginTextile = async () => {
-        setLoggedIn(false);
-        setLoggingIn(true);
-        // TODO: Check local storage to see if user is already logged in
+    const generateIdentity = async () => {
         console.log("Attempting to generate identity (keypair) based on password and metamask signature");
         const identityResult = await storage.generatePrivateKey(identityPassword);
-        // TODO: Store identity in local storage
-        setLoggingIn(false);
         if(identityResult) {
             console.log("Identity generated successfully");
-            setLoggedIn(true);
             await setIdentity(identityResult);
+            // Store identity in local storage
             storage.saveIdentity(who, identityResult);
 
-            // NOTE: setIdentity is likely to return before 'identity' is actually updated (ie. it's a sort of async update)
+            // NOTE: setIdentity is likely to return before 'identity' is actually updated (ie. it's an async update)
             console.log("identityResult", identityResult);  // TODO: Remove this
             console.log("identity", identity);  // TODO: Remove this
-
-            // Perform basic development auth connecting Alice to Endowl API key
-            console.log("Authorizing identity to use Textile with Endowl API key");
-            const client = await storage.authorizeTextileUser(storage.keyInfo, identityResult);
-            console.log("client", client);
-
-            // Open/create Bucket and fetch details
-            console.log("Fetching Textile Bucket details");
-            const {buckets, bucketKey} = await storage.setupBucket(storage.keyInfo, identityResult);
-            console.log("buckets", buckets);
-            console.log("bucketKey", bucketKey);
-
-
-            // TODO: Remove this test code:
-
-            /*
-            // Push a file to the Bucket
-            console.log("Pushing a test file to Textile Bucket");
-            const path = "testfile"
-            const string = "Hello world!"
-            const binaryStr = new TextEncoder().encode(string);
-            const raw = await buckets.pushPath(bucketKey, path, binaryStr)
-
-            console.log("raw", raw);
-
-            // Read back test file from the Bucket
-            console.log("Reading test file from Textile Bucket");
-            try {
-                const data = buckets.pullPath(bucketKey, path)
-                const { value } = await data.next();
-                console.log("data value", value)
-                let str = "";
-                for (let i = 0; i < value.length; i++) {
-                    str += String.fromCharCode(parseInt(value[i]));
-                }
-                console.log("str", str);
-
-            } catch (error) {
-                console.log("Error while loading file from bucket", error)
-            }
-            */
-
         }
+    }
+
+    const forgetIdentity = async () => {
+        console.log("Forgetting identity");
+        storage.clearIdentity(who);
+        setIdentity(null);
+    }
+
+    const connectToTextile = async () => {
+        console.log("Connecting to Textile");
+        if(!identity) {
+            console.log("Can't connect to Textile, identity not found")
+            return;
+        }
+        // Perform basic development auth connecting Alice to Endowl API key
+        console.log("Authorizing identity to use Textile with Endowl API key");
+        const client = await storage.authorizeTextileUser(storage.keyInfo, identity);
+        console.log("client", client);
+
+        // Open/create Bucket and fetch details
+        console.log("Fetching Textile Bucket details");
+        // const {buckets, bucketKey} = await storage.setupBucket(storage.keyInfo, identity);
+        const result = await storage.setupBucket(storage.keyInfo, identity);
+        console.log("buckets", result.buckets);
+        console.log("bucketKey", result.bucketKey);
+        setBuckets(result.buckets);
+        setBucketKey(result.bucketKey);
     }
 
     /*
@@ -203,29 +212,34 @@ function Alice() {
 
                 <img src={owlalice} className="App-logo" alt="logo" style={{maxWidth:"200px", height:"auto"}} />
 
-                <p>
-                    Login to Textile
-                </p>
-                <input type="text" placeholder="textile password" value={identityPassword} onChange={e => {setIdentityPassword(e.target.value)}} /><br />
-                <Button variant="primary" onClick={loginTextile}>
-                    Login with Metamask
-                </Button>
-                {loggingIn &&
-                    <p>
-                        Connecting...
-                    </p>
-                }
-                {loggedIn &&
-                    <p>
-                        Success!
-                    </p>
-                }
+                {!identity && (
+                    <>
+                        <p>
+                            Create Textile identity
+                        </p>
+                        <input type="text" placeholder="textile password" value={identityPassword} onChange={e => {setIdentityPassword(e.target.value)}} /><br />
+                        <Button variant="primary" onClick={generateIdentity}>
+                            Generate identity with Metamask
+                        </Button>
+                    </>
+                )}
                 {identity && (
                     <>
                         <p>
-                            Logged into Textile as:<br />
-                            <small>{identity.public.toString()}</small>
+                            Textile identity:<br />
+                            <small>{identity.public.toString()}</small><br />
+                            <Button variant="danger" onClick={forgetIdentity}>
+                                Forget Identity
+                            </Button>
                         </p>
+
+
+                        <p>
+                            Connect to Textile Buckets
+                        </p>
+                        <Button variant="success" onClick={connectToTextile}>
+                            Connect
+                        </Button>
 
                         <p>
                             Create document from template:
