@@ -96,6 +96,7 @@ function Alice() {
     const [bucketKey, setBucketKey] = useState(null);
     const [identityPassword, setIdentityPassword] = useState("");
     const [aliceBucketMockup, setAliceBucketMockup] = useState(0);
+    const [selectedFile, setSelectedFile] = useState();
 
     // const storage = new StorageMechanism();
 
@@ -108,8 +109,13 @@ function Alice() {
         // Push a file to the Bucket
         console.log("Pushing a test file to Textile Bucket");
         const path = "testfile"
+        // const string = "Hello world!"
         const string = "Hello world!"
         const binaryStr = new TextEncoder().encode(string);
+        // TODO: Fix: the following line causes this warning:
+        //       "Warning: findDOMNode is deprecated in StrictMode. findDOMNode was passed an instance of Transition
+        //       which is inside StrictMode. Instead, add a ref directly to the element you want to reference. Learn
+        //       more about using refs safely here: https://reactjs.org/link/strict-mode-find-node"
         const raw = await buckets.pushPath(bucketKey, path, binaryStr)
 
         console.log("raw", raw);
@@ -191,6 +197,41 @@ function Alice() {
         setBucketKey(result.bucketKey);
     }
 
+    const fileChange = async (event) => {
+        console.log("Selected file");
+        console.log("event", event);
+        const file = event.target.files[0];
+        console.log("file", file);
+        setSelectedFile(file);
+    }
+
+    const fileUpload = async (event) => {
+        console.log("Uploading file to Textile");
+        const path = "test_path";
+        const result = await storage.insertFile(buckets, bucketKey, selectedFile, path);
+        console.log("Done uploading file to Textile")
+        console.log("result", result);
+
+        // TODO: Move this
+        // Read back test file from the Bucket
+        console.log("Reading test file from Textile Bucket");
+        // TODO: Create link to download/view the retrieved file
+        try {
+            const data = buckets.pullPath(bucketKey, path)
+            const { value } = await data.next();
+            console.log("data value", value)
+            let str = "";
+            for (let i = 0; i < value.length; i++) {
+                str += String.fromCharCode(parseInt(value[i]));
+            }
+            console.log("str", str);
+
+        } catch (error) {
+            console.log("Error while loading file from bucket", error)
+        }
+
+    }
+
     /*
     useEffect(() => {
         async function doAsyncStuff() {
@@ -233,52 +274,67 @@ function Alice() {
                             </Button>
                         </p>
 
+                        {!bucketKey && (
+                            <>
+                                <p>
+                                    Connect to Textile Buckets
+                                </p>
+                                <Button variant="success" onClick={connectToTextile}>
+                                    Connect
+                                </Button>
+                            </>
+                        )}
 
-                        <p>
-                            Connect to Textile Buckets
-                        </p>
-                        <Button variant="success" onClick={connectToTextile}>
-                            Connect
-                        </Button>
+                        {bucketKey && (
+                            <>
+                                <p>
+                                    Upload document to Textile Bucket
+                                </p>
+                                <input type="file" id="upload" onChange={fileChange} />
+                                <Button variant="success" onClick={fileUpload}>
+                                    Upload
+                                </Button>
 
-                        <p>
-                            Create document from template:
-                        </p>
-                        <Button variant="primary" onClick={handleShow}>
-                            Opolis Policy Details
-                        </Button>
+                                <p>
+                                    Create document from template:
+                                </p>
+                                <Button variant="primary" onClick={handleShow}>
+                                    Opolis Policy Details
+                                </Button>
 
-                        <p>
-                            Save Alice's encrypted documents to Textile bucket.
-                        </p>
-                        <Button onClick={aliceMockup1}>
-                            Store on Textile
-                        </Button>
+                                <p>
+                                    Save Alice's encrypted documents to Textile bucket.
+                                </p>
+                                <Button onClick={aliceMockup1}>
+                                    Store on Textile
+                                </Button>
 
-                        <p>
-                            {/*Encrypt living document for Bob.*/}
-                            Share living document with Bob.
-                        </p>
-                        <Button onClick={aliceMockup2}>
-                            Share with Bob
-                        </Button>
+                                <p>
+                                    {/*Encrypt living document for Bob.*/}
+                                    Share living document with Bob.
+                                </p>
+                                <Button onClick={aliceMockup2}>
+                                    Share with Bob
+                                </Button>
 
-                        <p>
-                            Save proxy re-encryption keys with Owlfred.
-                        </p>
-                        <Button onClick={aliceMockup3}>
-                            Save proxy key
-                        </Button>
-                        <Collapse in={aliceBucketMockup >=3}>
-                            <h5><i>Proxy re-encryption keys saved with Owlfred</i></h5>
-                        </Collapse>
+                                <p>
+                                    Save proxy re-encryption keys with Owlfred.
+                                </p>
+                                <Button onClick={aliceMockup3}>
+                                    Save proxy key
+                                </Button>
+                                <Collapse in={aliceBucketMockup >=3}>
+                                    <h5><i>Proxy re-encryption keys saved with Owlfred</i></h5>
+                                </Collapse>
 
-                        <p>
-                            Re-encrypt post-mortem document for Bob when appropriate.
-                        </p>
-                        <Button onClick={aliceMockup4}>
-                            Re-encrypt for Bob
-                        </Button>
+                                <p>
+                                    Re-encrypt post-mortem document for Bob when appropriate.
+                                </p>
+                                <Button onClick={aliceMockup4}>
+                                    Re-encrypt for Bob
+                                </Button>
+                            </>
+                        )}
                     </>
                 )}
 
